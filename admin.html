@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Dashboard | Ice &amp; Fire Restaurant</title>
+  
+  <link rel="icon" type="image/png" href="assets/images/hero-cover.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Noto+Nastaliq+Urdu:wght@500;700&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="css/admin.css" />
+</head>
+<body>
+
+  <!-- Authentication PIN Gate -->
+  <div class="auth-overlay" id="authOverlay">
+    <div class="auth-card">
+      <div class="logo-badge">🔥❄️</div>
+      <h2>ICE &amp; FIRE ADMIN</h2>
+      <p>Management Portal • Faisal Tower, Quetta</p>
+
+      <input type="password" id="pinInput" placeholder="Enter Access PIN" maxlength="20" autofocus />
+      <button type="button" class="btn-primary" id="pinSubmitBtn" style="width: 100%; padding: 12px; background: linear-gradient(135deg, #00d2ff, #0077ff); color: #000; font-weight: 700; border-radius: 8px; cursor: pointer; border: none;">
+        Unlock Dashboard
+      </button>
+
+      <p id="authErrorMsg" style="color: #ef4444; font-size: 0.8rem; margin-top: 12px; display: none;"></p>
+      <div class="auth-hint">Default Security PIN is: <strong>ice123</strong></div>
+    </div>
+  </div>
+
+  <!-- Admin Main Layout -->
+  <div class="admin-layout" id="adminLayout" style="display: none;">
+    <!-- Sidebar -->
+    <aside class="admin-sidebar">
+      <div class="sidebar-header">
+        <div style="font-size: 1.6rem;">❄️🔥</div>
+        <div>
+          <div class="sidebar-brand-name">ICE &amp; FIRE</div>
+          <div class="sidebar-brand-sub">Admin Portal</div>
+        </div>
+      </div>
+
+      <ul class="sidebar-menu" id="sidebarMenu">
+        <li>
+          <button type="button" class="menu-item-btn active" data-tab="overview">
+            <span>📊</span>
+            <span>Dashboard</span>
+          </button>
+        </li>
+        <li>
+          <button type="button" class="menu-item-btn" data-tab="menu">
+            <span>🍽️</span>
+            <span>Menu Items</span>
+          </button>
+        </li>
+        <li>
+          <button type="button" class="menu-item-btn" data-tab="orders">
+            <span>🛵</span>
+            <span>Live Orders</span>
+            <span class="menu-item-badge" id="orderCountBadge" style="display: none;">0</span>
+          </button>
+        </li>
+        <li>
+          <button type="button" class="menu-item-btn" data-tab="reservations">
+            <span>📅</span>
+            <span>Table Bookings</span>
+            <span class="menu-item-badge" id="resCountBadge" style="display: none;">0</span>
+          </button>
+        </li>
+        <li>
+          <button type="button" class="menu-item-btn" data-tab="settings">
+            <span>⚙️</span>
+            <span>Settings</span>
+          </button>
+        </li>
+        <li>
+          <button type="button" class="menu-item-btn" data-tab="backup">
+            <span>💾</span>
+            <span>Backup &amp; Reset</span>
+          </button>
+        </li>
+      </ul>
+
+      <div class="sidebar-footer">
+        <a href="index.html" class="sidebar-link" target="_blank">
+          <span>🌐</span>
+          <span>Open Customer Website</span>
+        </a>
+        <div class="sidebar-link" id="btnLogout" style="color: #ef4444;">
+          <span>🔒</span>
+          <span>Lock / Logout</span>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="admin-main">
+      <!-- Topbar -->
+      <header class="admin-topbar">
+        <div class="topbar-title" id="topbarTitle">
+          <h1>Dashboard Overview</h1>
+          <p>Ice &amp; Fire Restaurant Management System</p>
+        </div>
+        <div class="topbar-actions">
+          <a href="index.html" target="_blank" class="admin-select" style="text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">
+            <span>👁️ View Live Website</span>
+          </a>
+        </div>
+      </header>
+
+      <div class="admin-body">
+        <!-- TAB 1: OVERVIEW -->
+        <div class="admin-tab-pane active" id="tab-overview">
+          <!-- KPIs -->
+          <div class="kpi-grid">
+            <div class="kpi-card">
+              <div class="kpi-icon-wrap" style="color: var(--accent-gold);">🍽️</div>
+              <div>
+                <div class="kpi-value" id="kpiDishes">0</div>
+                <div class="kpi-label">Active Dishes</div>
+              </div>
+            </div>
+            <div class="kpi-card">
+              <div class="kpi-icon-wrap" style="color: var(--accent-fire);">🛵</div>
+              <div>
+                <div class="kpi-value" id="kpiOrders">0</div>
+                <div class="kpi-label">Total Orders</div>
+              </div>
+            </div>
+            <div class="kpi-card">
+              <div class="kpi-icon-wrap" style="color: var(--accent-success);">💰</div>
+              <div>
+                <div class="kpi-value" id="kpiRevenue">Rs. 0</div>
+                <div class="kpi-label">Total Sales (PKR)</div>
+              </div>
+            </div>
+            <div class="kpi-card">
+              <div class="kpi-icon-wrap" style="color: var(--accent-ice);">🛋️</div>
+              <div>
+                <div class="kpi-value" id="kpiReservations">0</div>
+                <div class="kpi-label">Reservations</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Recent Orders Widget -->
+          <div class="data-card">
+            <div class="data-card-header">
+              <h3><span>🔥</span> Recent Customer Orders</h3>
+              <button type="button" class="admin-select" onclick="document.querySelector('[data-tab=\'orders\']').click()">
+                View All Orders →
+              </button>
+            </div>
+            <div class="data-table-wrap">
+              <table class="admin-table">
+                <thead>
+                  <tr>
+                    <th>Order ID</th>
+                    <th>Customer</th>
+                    <th>Amount</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody id="recentOrdersBody">
+                  <!-- Populated by JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB 2: MENU ITEMS MANAGEMENT -->
+        <div class="admin-tab-pane" id="tab-menu">
+          <div class="data-card">
+            <div class="data-card-header">
+              <h3><span>📋</span> Restaurant Menu Items</h3>
+              <div class="table-controls">
+                <input type="text" id="adminMenuSearch" class="admin-search-input" placeholder="Search dish..." />
+                <select id="adminCatFilter" class="admin-select">
+                  <option value="all">All Categories</option>
+                  <option value="starter">Starters &amp; Fries</option>
+                  <option value="soup">Gourmet Soups</option>
+                  <option value="burger">Burgers &amp; Grill</option>
+                  <option value="sandwich">Sandwiches</option>
+                  <option value="pasta">Pastas</option>
+                  <option value="mocktail">Mocktails</option>
+                  <option value="margarita">Margaritas</option>
+                  <option value="hot-beverages">Hot Beverages</option>
+                  <option value="smoke-item">Smoke Item</option>
+                  <option value="icecream-shakes">Ice Cream Shakes</option>
+                  <option value="fresh-fruit-shakes">Fruit Shakes</option>
+                  <option value="fresh-juice">Fresh Juices</option>
+                  <option value="handmade-icecream">Hand Made Ice Cream</option>
+                </select>
+                <button type="button" class="btn-primary" id="btnOpenAddDish" style="padding: 8px 16px; background: linear-gradient(135deg, #00d2ff, #0077ff); color: #000; font-weight: 700; border-radius: 8px; cursor: pointer; border: none;">
+                  + Add New Dish
+                </button>
+              </div>
+            </div>
+
+            <div class="data-table-wrap">
+              <table class="admin-table">
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>Dish Name &amp; Urdu</th>
+                    <th>Category</th>
+                    <th>Price (PKR)</th>
+                    <th>Badge</th>
+                    <th>Stock Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="menuTableBody">
+                  <!-- Populated by JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB 3: LIVE ORDERS -->
+        <div class="admin-tab-pane" id="tab-orders">
+          <div class="data-card">
+            <div class="data-card-header">
+              <h3><span>🛵</span> Live Orders Manager</h3>
+            </div>
+            <div class="data-table-wrap">
+              <table class="admin-table">
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Timestamp</th>
+                    <th>Customer Details</th>
+                    <th>Items</th>
+                    <th>Total</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="ordersTableBody">
+                  <!-- Populated by JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB 4: RESERVATIONS -->
+        <div class="admin-tab-pane" id="tab-reservations">
+          <div class="data-card">
+            <div class="data-card-header">
+              <h3><span>🛋️</span> Table Reservations</h3>
+            </div>
+            <div class="data-table-wrap">
+              <table class="admin-table">
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Guest</th>
+                    <th>Guests Count</th>
+                    <th>Date &amp; Time</th>
+                    <th>Area</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="reservationsTableBody">
+                  <!-- Populated by JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB 5: RESTAURANT SETTINGS -->
+        <div class="admin-tab-pane" id="tab-settings">
+          <div class="data-card" style="max-width: 800px;">
+            <div class="data-card-header">
+              <h3><span>⚙️</span> Restaurant Information &amp; Delivery Rules</h3>
+            </div>
+            <form id="settingsForm" style="padding: 24px;">
+              <div class="admin-form-grid">
+                <div class="admin-form-group">
+                  <label for="settingPhone">Primary Landline Phone</label>
+                  <input type="text" id="settingPhone" class="admin-form-control" required />
+                </div>
+                <div class="admin-form-group">
+                  <label for="settingWhatsapp">Mobile / WhatsApp Number</label>
+                  <input type="text" id="settingWhatsapp" class="admin-form-control" required />
+                </div>
+                <div class="admin-form-group">
+                  <label for="settingMinDelivery">Free Delivery Minimum (PKR)</label>
+                  <input type="number" id="settingMinDelivery" class="admin-form-control" required />
+                </div>
+                <div class="admin-form-group">
+                  <label for="settingDeliveryFee">Delivery Fee if Below Min (PKR)</label>
+                  <input type="number" id="settingDeliveryFee" class="admin-form-control" required />
+                </div>
+                <div class="admin-form-group form-full">
+                  <label for="settingAddress">Restaurant Location &amp; Plus Code</label>
+                  <input type="text" id="settingAddress" class="admin-form-control" required />
+                </div>
+                <div class="admin-form-group form-full">
+                  <label for="settingTiming">Business Hours</label>
+                  <input type="text" id="settingTiming" class="admin-form-control" required />
+                </div>
+              </div>
+              <div style="margin-top: 24px; text-align: right;">
+                <button type="submit" style="padding: 12px 28px; background: linear-gradient(135deg, #dfb76c, #996515); color: #000; font-weight: 700; border-radius: 8px; cursor: pointer; border: none;">
+                  Save Restaurant Settings
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <!-- TAB 6: BACKUP & DATA MAINTENANCE -->
+        <div class="admin-tab-pane" id="tab-backup">
+          <div class="data-card" style="max-width: 800px;">
+            <div class="data-card-header">
+              <h3><span>💾</span> Database Backup &amp; Factory Reset</h3>
+            </div>
+            <div style="padding: 24px; display: flex; flex-direction: column; gap: 20px;">
+              <div style="padding: 16px; background: #161e2e; border-radius: 8px; border: 1px solid var(--admin-border);">
+                <h4 style="color: #ffffff; margin-bottom: 6px;">Restore Default Menu from Reference Scans</h4>
+                <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 14px;">
+                  Instantly restores all 60+ dishes from the uploaded menu pictures (Pizza Fries, Soups, Burgers, Pastas, Ice Creams, Mocktails).
+                </p>
+                <button type="button" id="btnResetMenu" style="padding: 10px 20px; background: #ef4444; color: #fff; font-weight: 700; border-radius: 6px; cursor: pointer; border: none;">
+                  ⚠️ Reset Menu to Reference Scans
+                </button>
+              </div>
+
+              <div style="padding: 16px; background: #161e2e; border-radius: 8px; border: 1px solid var(--admin-border);">
+                <h4 style="color: #ffffff; margin-bottom: 6px;">Export Menu Backup (JSON)</h4>
+                <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 14px;">
+                  Download a complete backup of all current menu items, pricing, and configurations.
+                </p>
+                <button type="button" id="btnExportMenu" style="padding: 10px 20px; background: #10b981; color: #fff; font-weight: 700; border-radius: 6px; cursor: pointer; border: none;">
+                  📥 Export Menu as JSON
+                </button>
+              </div>
+
+              <div style="padding: 16px; background: #161e2e; border-radius: 8px; border: 1px solid var(--admin-border);">
+                <h4 style="color: #ffffff; margin-bottom: 6px;">Import Menu Backup (JSON)</h4>
+                <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 14px;">
+                  Upload a previously saved JSON file to restore dishes.
+                </p>
+                <input type="file" id="importFileInput" accept=".json" style="display: none;" />
+                <button type="button" id="btnImportMenu" style="padding: 10px 20px; background: #3b82f6; color: #fff; font-weight: 700; border-radius: 6px; cursor: pointer; border: none;">
+                  📤 Import Menu File
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </main>
+  </div>
+
+  <!-- ADD / EDIT DISH MODAL -->
+  <div class="admin-modal-overlay" id="dishModal">
+    <div class="admin-modal-dialog">
+      <div class="admin-modal-header">
+        <h3 id="dishModalTitle">Add New Dish</h3>
+        <button type="button" id="btnCloseDishModal" style="background: none; border: none; color: #fff; font-size: 1.4rem; cursor: pointer;">✕</button>
+      </div>
+      <form id="dishForm">
+        <div class="admin-modal-body">
+          <input type="hidden" id="dishIdInput" />
+          <div class="admin-form-grid">
+            <div class="admin-form-group">
+              <label for="dishNumInput">Dish #</label>
+              <input type="text" id="dishNumInput" class="admin-form-control" placeholder="e.g. 17" required />
+            </div>
+            <div class="admin-form-group">
+              <label for="dishCatInput">Category *</label>
+              <select id="dishCatInput" class="admin-form-control" required>
+                <option value="starter">Starters &amp; Fries</option>
+                <option value="soup">Gourmet Soups</option>
+                <option value="burger">Burgers &amp; Grill</option>
+                <option value="sandwich">Sandwiches</option>
+                <option value="pasta">Pastas</option>
+                <option value="mocktail">Mocktails</option>
+                <option value="margarita">Margaritas</option>
+                <option value="hot-beverages">Hot Beverages</option>
+                <option value="smoke-item">Smoke Item</option>
+                <option value="icecream-shakes">Ice Cream Shakes</option>
+                <option value="fresh-fruit-shakes">Fruit Shakes</option>
+                <option value="fresh-juice">Fresh Juices</option>
+                <option value="handmade-icecream">Hand Made Ice Cream</option>
+              </select>
+            </div>
+            <div class="admin-form-group">
+              <label for="dishNameInput">Dish Name (English) *</label>
+              <input type="text" id="dishNameInput" class="admin-form-control" placeholder="e.g. Chicken Lava Burger" required />
+            </div>
+            <div class="admin-form-group">
+              <label for="dishUrduInput">Dish Name (Urdu)</label>
+              <input type="text" id="dishUrduInput" class="admin-form-control" placeholder="e.g. چکن لاوا برگر" style="font-family: var(--font-urdu);" />
+            </div>
+            <div class="admin-form-group">
+              <label for="dishPriceInput">Full Price (PKR) *</label>
+              <input type="number" id="dishPriceInput" class="admin-form-control" placeholder="e.g. 590" required />
+            </div>
+            <div class="admin-form-group">
+              <label for="dishHalfPriceInput">Half Price (Optional, for Soups/Tubs)</label>
+              <input type="number" id="dishHalfPriceInput" class="admin-form-control" placeholder="e.g. 300" />
+            </div>
+            <div class="admin-form-group">
+              <label for="dishBadgeInput">Badge / Tag</label>
+              <input type="text" id="dishBadgeInput" class="admin-form-control" placeholder="e.g. Bestseller 🔥 or Subzero ❄️" />
+            </div>
+            <div class="admin-form-group">
+              <label for="dishImgInput">Image URL</label>
+              <input type="url" id="dishImgInput" class="admin-form-control" placeholder="https://..." />
+            </div>
+            <div class="admin-form-group form-full">
+              <label for="dishDescInput">Description &amp; Ingredients</label>
+              <textarea id="dishDescInput" class="admin-form-control" rows="2" placeholder="Description of the dish..."></textarea>
+            </div>
+            <div class="admin-form-group form-full">
+              <label class="switch-label">
+                <input type="checkbox" id="dishStockInput" class="switch-input" checked />
+                <span>Mark as In Stock &amp; Available for Ordering</span>
+              </label>
+            </div>
+          </div>
+        </div>
+        <div class="admin-modal-footer">
+          <button type="button" id="btnCancelDishModal" class="admin-select">Cancel</button>
+          <button type="submit" style="padding: 10px 24px; background: linear-gradient(135deg, #00d2ff, #0077ff); color: #000; font-weight: 700; border-radius: 6px; cursor: pointer; border: none;">
+            Save Dish
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- PRINTABLE RECEIPT / INVOICE MODAL -->
+  <div class="admin-modal-overlay" id="receiptModal">
+    <div class="admin-modal-dialog" style="max-width: 480px;">
+      <div class="admin-modal-header">
+        <h3>Customer Receipt</h3>
+        <button type="button" id="btnCloseReceipt" style="background: none; border: none; color: #fff; font-size: 1.4rem; cursor: pointer;">✕</button>
+      </div>
+      <div class="admin-modal-body" style="background: #e2e8f0; padding: 20px;">
+        <div id="receiptContent">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+      <div class="admin-modal-footer">
+        <button type="button" id="btnPrintReceipt" style="padding: 10px 24px; background: #0f172a; color: #fff; font-weight: 700; border-radius: 6px; cursor: pointer; border: none;">
+          🖨️ Print Receipt
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="js/menu-data.js"></script>
+  <script src="js/admin.js"></script>
+</body>
+</html>
